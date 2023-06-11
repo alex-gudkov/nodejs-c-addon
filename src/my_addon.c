@@ -101,10 +101,10 @@ static napi_value run_callback(napi_env env, const napi_callback_info info)
 
     napi_value callback = argv[0];
 
-    size_t callback_argc = 1;
+    const unsigned int callback_argc = 1U;
     napi_value callback_argv[callback_argc];
 
-    status = napi_create_string_utf8(env, "hello", NAPI_AUTO_LENGTH, callback_argv + 0);
+    status = napi_create_double(env, 12.34, callback_argv + 0);
     assert(status == napi_ok);
 
     napi_value global;
