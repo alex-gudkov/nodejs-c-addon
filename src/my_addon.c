@@ -12,7 +12,7 @@ static napi_value get_string(napi_env env, napi_callback_info info)
     napi_status status;
     napi_value value;
 
-    status = napi_create_string_utf8(env, "Hello world!", 12, &value);
+    status = napi_create_string_utf8(env, "Hello world!", NAPI_AUTO_LENGTH, &value);
     assert(status == napi_ok);
 
     return value;
@@ -23,9 +23,9 @@ static napi_value sum_numbers(napi_env env, napi_callback_info info)
     napi_status status;
 
     size_t argc = 2;
-    napi_value args[2];
+    napi_value argv[2];
 
-    status = napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+    status = napi_get_cb_info(env, info, &argc, argv, NULL, NULL);
     assert(status == napi_ok);
 
     if (argc != 2)
@@ -37,12 +37,12 @@ static napi_value sum_numbers(napi_env env, napi_callback_info info)
 
     napi_valuetype arg0_type;
 
-    status = napi_typeof(env, args[0], &arg0_type);
+    status = napi_typeof(env, argv[0], &arg0_type);
     assert(status == napi_ok);
 
     napi_valuetype arg1_type;
 
-    status = napi_typeof(env, args[1], &arg1_type);
+    status = napi_typeof(env, argv[1], &arg1_type);
     assert(status == napi_ok);
 
     if (arg0_type != napi_number || arg1_type != napi_number)
@@ -54,12 +54,12 @@ static napi_value sum_numbers(napi_env env, napi_callback_info info)
 
     double arg0;
 
-    status = napi_get_value_double(env, args[0], &arg0);
+    status = napi_get_value_double(env, argv[0], &arg0);
     assert(status == napi_ok);
 
     double arg1;
 
-    status = napi_get_value_double(env, args[1], &arg1);
+    status = napi_get_value_double(env, argv[1], &arg1);
     assert(status == napi_ok);
 
     napi_value value;
@@ -75,16 +75,36 @@ static napi_value run_callback(napi_env env, const napi_callback_info info)
     napi_status status;
 
     size_t argc = 1;
-    napi_value args[1];
- 
-    status = napi_get_cb_info(env, info, &argc, args, NULL, NULL);
-    assert(status == napi_ok);
-
-    napi_value callback = args[0];
-
     napi_value argv[1];
 
-    status = napi_create_string_utf8(env, "hello world", NAPI_AUTO_LENGTH, argv);
+    status = napi_get_cb_info(env, info, &argc, argv, NULL, NULL);
+    assert(status == napi_ok);
+
+    if (argc != 1)
+    {
+        napi_throw_type_error(env, NULL, "Wrong number of arguments");
+
+        return NULL;
+    }
+
+    napi_valuetype arg0_type;
+
+    status = napi_typeof(env, argv[0], &arg0_type);
+    assert(status == napi_ok);
+
+    if (arg0_type != napi_function)
+    {
+        napi_throw_type_error(env, NULL, "Wrong arguments type");
+
+        return NULL;
+    }
+
+    napi_value callback = argv[0];
+
+    size_t callback_argc = 1;
+    napi_value callback_argv[callback_argc];
+
+    status = napi_create_string_utf8(env, "hello", NAPI_AUTO_LENGTH, callback_argv + 0);
     assert(status == napi_ok);
 
     napi_value global;
@@ -94,7 +114,7 @@ static napi_value run_callback(napi_env env, const napi_callback_info info)
 
     napi_value result;
 
-    status = napi_call_function(env, global, callback, 1, argv, &result);
+    status = napi_call_function(env, global, callback, 1, callback_argv, &result);
     assert(status == napi_ok);
 
     return NULL;
