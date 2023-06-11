@@ -36,12 +36,12 @@ static napi_value sum_numbers(napi_env env, napi_callback_info info)
     }
 
     napi_valuetype arg0_type;
-    
+
     status = napi_typeof(env, args[0], &arg0_type);
     assert(status == napi_ok);
 
     napi_valuetype arg1_type;
-    
+
     status = napi_typeof(env, args[1], &arg1_type);
     assert(status == napi_ok);
 
@@ -70,6 +70,36 @@ static napi_value sum_numbers(napi_env env, napi_callback_info info)
     return value;
 }
 
+static napi_value run_callback(napi_env env, const napi_callback_info info)
+{
+    napi_status status;
+
+    size_t argc = 1;
+    napi_value args[1];
+ 
+    status = napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+    assert(status == napi_ok);
+
+    napi_value callback = args[0];
+
+    napi_value argv[1];
+
+    status = napi_create_string_utf8(env, "hello world", NAPI_AUTO_LENGTH, argv);
+    assert(status == napi_ok);
+
+    napi_value global;
+
+    status = napi_get_global(env, &global);
+    assert(status == napi_ok);
+
+    napi_value result;
+
+    status = napi_call_function(env, global, callback, 1, argv, &result);
+    assert(status == napi_ok);
+
+    return NULL;
+}
+
 static napi_value init(napi_env env, napi_value exports)
 {
     napi_status status;
@@ -80,8 +110,13 @@ static napi_value init(napi_env env, napi_value exports)
     assert(status == napi_ok);
 
     napi_property_descriptor sum_numbers_descriptor = DECLARE_NAPI_METHOD("sumNumbers", sum_numbers);
-    
+
     status = napi_define_properties(env, exports, 1, &sum_numbers_descriptor);
+    assert(status == napi_ok);
+
+    napi_property_descriptor run_callback_descriptor = DECLARE_NAPI_METHOD("runCallback", run_callback);
+
+    status = napi_define_properties(env, exports, 1, &run_callback_descriptor);
     assert(status == napi_ok);
 
     return exports;
