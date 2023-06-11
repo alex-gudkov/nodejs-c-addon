@@ -1,5 +1,5 @@
 const myAddon = require('../build/my-addon.node');
 
-console.log(myAddon.hello());
+console.log(myAddon.getString());
 
-console.log(myAddon.add(1, 2));
+console.log(myAddon.sumNumbers(1, 2));
