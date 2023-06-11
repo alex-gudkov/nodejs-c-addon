@@ -1,21 +1,20 @@
 #include <assert.h>
 #include <node_api.h>
-#include <stdio.h>
 
-#define DECLARE_NAPI_METHOD(name, func)         \
-    {                                           \
-        name, 0, func, 0, 0, 0, napi_default, 0 \
-    }
+#define DECLARE_NAPI_METHOD(name, func)                     \
+{                                                           \
+    name, NULL, func, NULL, NULL, NULL, napi_default, NULL  \
+}
 
 static napi_value get_string(napi_env env, napi_callback_info info)
 {
     napi_status status;
-    napi_value value;
+    napi_value string;
 
-    status = napi_create_string_utf8(env, "Hello world!", NAPI_AUTO_LENGTH, &value);
+    status = napi_create_string_utf8(env, "Hello world!", NAPI_AUTO_LENGTH, &string);
     assert(status == napi_ok);
 
-    return value;
+    return string;
 }
 
 static napi_value sum_numbers(napi_env env, napi_callback_info info)
@@ -62,12 +61,12 @@ static napi_value sum_numbers(napi_env env, napi_callback_info info)
     status = napi_get_value_double(env, argv[1], &arg1);
     assert(status == napi_ok);
 
-    napi_value value;
+    napi_value sum;
 
-    status = napi_create_double(env, arg0 + arg1, &value);
+    status = napi_create_double(env, arg0 + arg1, &sum);
     assert(status == napi_ok);
 
-    return value;
+    return sum;
 }
 
 static napi_value run_callback(napi_env env, const napi_callback_info info)
@@ -101,7 +100,7 @@ static napi_value run_callback(napi_env env, const napi_callback_info info)
 
     napi_value callback = argv[0];
 
-    const unsigned int callback_argc = 1U;
+    size_t callback_argc = 1;
     napi_value callback_argv[callback_argc];
 
     status = napi_create_double(env, 12.34, callback_argv + 0);
@@ -128,20 +127,20 @@ static napi_value get_object(napi_env env, napi_callback_info info)
     status = napi_create_object(env, &object);
     assert(status == napi_ok);
 
-    napi_value named_property_x;
+    napi_value property_x;
 
-    status = napi_create_int32(env, 1, &named_property_x);
+    status = napi_create_int32(env, 1, &property_x);
     assert(status == napi_ok);
 
-    status = napi_set_named_property(env, object, "x", named_property_x);
+    status = napi_set_named_property(env, object, "x", property_x);
     assert(status == napi_ok);
 
-    napi_value named_property_y;
+    napi_value property_y;
 
-    status = napi_create_int32(env, 2, &named_property_y);
+    status = napi_create_int32(env, 2, &property_y);
     assert(status == napi_ok);
 
-    status = napi_set_named_property(env, object, "y", named_property_y);
+    status = napi_set_named_property(env, object, "y", property_y);
     assert(status == napi_ok);
 
     return object;
@@ -152,12 +151,12 @@ static napi_value get_array(napi_env env, napi_callback_info info)
     napi_status status;
     napi_value array;
 
-    unsigned long length = 5;
+    size_t length = 5;
 
     status = napi_create_array_with_length(env, length, &array);
     assert(status == napi_ok);
 
-    for (unsigned long i = 0; i < length; ++i)
+    for (size_t i = 0; i < length; ++i)
     {
         napi_value element;
 
@@ -171,7 +170,7 @@ static napi_value get_array(napi_env env, napi_callback_info info)
     return array;
 }
 
-static napi_value init(napi_env env, napi_value exports)
+static napi_value initialize(napi_env env, napi_value exports)
 {
     napi_status status;
 
@@ -203,4 +202,4 @@ static napi_value init(napi_env env, napi_value exports)
     return exports;
 }
 
-NAPI_MODULE(NODE_GYP_MODULE_NAME, init)
+NAPI_MODULE(NODE_GYP_MODULE_NAME, initialize)
