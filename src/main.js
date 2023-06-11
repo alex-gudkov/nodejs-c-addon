@@ -9,3 +9,5 @@ myAddon.runCallback((value) => {
 });
 
 console.log(myAddon.getObject());
+
+console.log(myAddon.getArray());

@@ -147,6 +147,30 @@ static napi_value get_object(napi_env env, napi_callback_info info)
     return object;
 }
 
+static napi_value get_array(napi_env env, napi_callback_info info)
+{
+    napi_status status;
+    napi_value array;
+
+    unsigned long length = 5;
+
+    status = napi_create_array_with_length(env, length, &array);
+    assert(status == napi_ok);
+
+    for (unsigned long i = 0; i < length; ++i)
+    {
+        napi_value element;
+
+        status = napi_create_int32(env, i + 1, &element);
+        assert(status == napi_ok);
+
+        status = napi_set_element(env, array, i, element);
+        assert(status == napi_ok);
+    }
+
+    return array;
+}
+
 static napi_value init(napi_env env, napi_value exports)
 {
     napi_status status;
@@ -169,6 +193,11 @@ static napi_value init(napi_env env, napi_value exports)
     napi_property_descriptor get_object_descriptor = DECLARE_NAPI_METHOD("getObject", get_object);
 
     status = napi_define_properties(env, exports, 1, &get_object_descriptor);
+    assert(status == napi_ok);
+
+    napi_property_descriptor get_array_descriptor = DECLARE_NAPI_METHOD("getArray", get_array);
+
+    status = napi_define_properties(env, exports, 1, &get_array_descriptor);
     assert(status == napi_ok);
 
     return exports;
