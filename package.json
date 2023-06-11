@@ -1,0 +1,15 @@
+{
+  "name": "nodejs-c-addon",
+  "version": "1.0.0",
+  "description": "",
+  "author": "alex-gudkov",
+  "private": true,
+  "license": "UNLICENSED",
+  "main": "./src/main.js",
+  "scripts": {
+    "start": "node ./src/main.js",
+    "build": "gcc -shared -o ./build/my-addon.node -fPIC -I/home/user/.cache/node-gyp/18.15.0/include/node ./src/my_addon.c"
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}
