@@ -120,6 +120,33 @@ static napi_value run_callback(napi_env env, const napi_callback_info info)
     return NULL;
 }
 
+static napi_value get_object(napi_env env, napi_callback_info info)
+{
+    napi_status status;
+    napi_value object;
+
+    status = napi_create_object(env, &object);
+    assert(status == napi_ok);
+
+    napi_value named_property_x;
+
+    status = napi_create_int32(env, 1, &named_property_x);
+    assert(status == napi_ok);
+
+    status = napi_set_named_property(env, object, "x", named_property_x);
+    assert(status == napi_ok);
+
+    napi_value named_property_y;
+
+    status = napi_create_int32(env, 2, &named_property_y);
+    assert(status == napi_ok);
+
+    status = napi_set_named_property(env, object, "y", named_property_y);
+    assert(status == napi_ok);
+
+    return object;
+}
+
 static napi_value init(napi_env env, napi_value exports)
 {
     napi_status status;
@@ -137,6 +164,11 @@ static napi_value init(napi_env env, napi_value exports)
     napi_property_descriptor run_callback_descriptor = DECLARE_NAPI_METHOD("runCallback", run_callback);
 
     status = napi_define_properties(env, exports, 1, &run_callback_descriptor);
+    assert(status == napi_ok);
+
+    napi_property_descriptor get_object_descriptor = DECLARE_NAPI_METHOD("getObject", get_object);
+
+    status = napi_define_properties(env, exports, 1, &get_object_descriptor);
     assert(status == napi_ok);
 
     return exports;

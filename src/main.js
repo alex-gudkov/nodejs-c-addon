@@ -7,3 +7,5 @@ console.log(myAddon.sumNumbers(1, 2));
 myAddon.runCallback((value) => {
   console.log(value);
 });
+
+console.log(myAddon.getObject());
